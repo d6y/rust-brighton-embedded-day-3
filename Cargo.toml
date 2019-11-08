@@ -2,7 +2,7 @@
 authors = ["Richard Dallaway <richard@dallaway.com>"]
 edition = "2018"
 readme = "README.md"
-name = "rust-brighton-embedded-day-2"
+name = "rust-brighton-embedded-day-3"
 version = "0.1.0"
 
 [dependencies]
@@ -28,7 +28,7 @@ stm32f4xx-hal = { version = "0.6.0", features = ["stm32f411"]}
 
 # this lets you use `cargo fix`!
 [[bin]]
-name = "rust-brighton-embedded-day-2"
+name = "rust-brighton-embedded-day-3"
 test = false
 bench = false
 
