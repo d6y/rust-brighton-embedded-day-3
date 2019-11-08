@@ -2,20 +2,26 @@
 #![no_std]
 
 extern crate panic_halt;
-
-use cortex_m;
-use cortex_m_rt::entry;
+// use cortex_m;
 
 use crate::hal::{prelude::*, stm32};
 use stm32f4xx_hal as hal;
 
-#[entry]
-fn main() -> ! {
-    // Access the device peripherals (dp) and cortex peripherals (cp):
-    if let (Some(dp), Some(cp)) = (
-        stm32::Peripherals::take(),
-        cortex_m::peripheral::Peripherals::take(),
-    ) {
+use cortex_m_semihosting::hprintln;
+// use panic_semihosting as _;
+
+#[rtfm::app(device = stm32f4xx_hal::stm32, peripherals = true)]
+const APP: () = {
+    #[init]
+    fn init(cx: init::Context) {
+        hprintln!("init").unwrap();
+
+        // Cortex-M peripherals
+        let cp: cortex_m::Peripherals = cx.core;
+
+        // Device specific peripherals
+        let dp: stm32::Peripherals = cx.device;
+
         // Set up the LED: it's connected to pin PA5 on the microcontroler
         let gpioa = dp.GPIOA.split();
         let mut led = gpioa.pa5.into_push_pull_output();
@@ -31,8 +37,6 @@ fn main() -> ! {
         let mut delay = hal::delay::Delay::new(cp.SYST, clocks);
 
         loop {
-            // On for 1s, off for 1s.
-            // https://doc.rust-lang.org/std/convert/enum.Infallible.html
             led.set_high().unwrap();
             xled.set_low().unwrap();
             delay.delay_ms(1000_u32);
@@ -40,7 +44,11 @@ fn main() -> ! {
             xled.set_high().unwrap();
             delay.delay_ms(1000_u32);
         }
-    } else {
-        panic!("failed to access peripherals");
     }
-}
+
+    #[idle]
+    fn idle(cx: idle::Context) -> ! {
+        hprintln!("idle").unwrap();
+        loop {}
+    }
+};
